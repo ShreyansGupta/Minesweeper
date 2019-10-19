@@ -151,3 +151,10 @@ class Agent:
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
                         self.probabilityMatrix[i][j] = min(self.probabilityMatrix[i][j], probability)
+
+    def getMinimumProb(self):
+        minProb = []
+        a, b = np.where(self.probabilityMatrix == np.min(self.probabilityMatrix))
+        for i in range(a.shape[0]):
+            minProb.append((a[i],b[i]))
+        return minProb
