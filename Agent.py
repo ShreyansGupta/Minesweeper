@@ -102,7 +102,7 @@ class Agent:
                 # Safe to query these elements
                 self.agentBoard[r][c] = -3;
                 newInfo = 1
-        if(8-minesCount == safeCount):
+        if(8-minesCount == safeCount or effectiveMinesCount == len(unrevealedList)):
             for (r,c) in unrevealedList:
                 self.agentBoard[r][c] = -1;
                 newInfo = 1
