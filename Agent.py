@@ -50,7 +50,7 @@ class Agent:
         return (unrevealed, safe_revealed+safe_unrevealed, revealed_mines)
 
     def updateKnowledge(self,i,j,val, query):
-        agentBoard[i][j]=val
+        self.agentBoard[i][j]=val
         noOfIter = 0
         currSet1=set()
         currSet1.add((i,j))
@@ -60,7 +60,7 @@ class Agent:
             currSet1 = currSet1+updated_set
             while (updated_set):
                 if query:
-                    p, q = a.pop()
+                    p, q = updated_set.pop()
                     self.querySafeCells(p,q)
 
             noOfIter += 1
@@ -99,7 +99,7 @@ class Agent:
         return count;
 
     def updateNeighbours(self, row, column):
-        new_neighbours=set()
+        updated_neighbours=set()
         minesCount = self.agentBoard[row][column]
         if(minesCount < 0):
             return 0
@@ -110,14 +110,14 @@ class Agent:
             for (r,c) in unrevealedList:
                 # Safe to query these elements
                 self.agentBoard[r][c] = -3;
-                new_neighbours.add((r,c))
+                updated_neighbours.add((r,c))
                 # newInfo = 1
         if(8-minesCount == safeCount or effectiveMinesCount == len(unrevealedList)):
             for (r,c) in unrevealedList:
                 self.agentBoard[r][c] = -1;
-                new_neighbours.add((r, c))
+                updated_neighbours.add((r, c))
                 # newInfo = 1
-        return new_neighbours
+        return updated_neighbours
 
     def checkInconsistency(self):
         for i in range(self.dimension):
