@@ -103,6 +103,7 @@ class Agent:
         return count;
 
     def updateNeighbours(self, row, column):
+        new_neighbours=set()
         minesCount = self.agentBoard[row][column]
         if(minesCount < 0):
             return 0
@@ -113,14 +114,14 @@ class Agent:
             for (r,c) in unrevealedList:
                 # Safe to query these elements
                 self.agentBoard[r][c] = -3;
-                set1.add((r,c))
+                new_neighbours.add((r,c))
                 # newInfo = 1
         if(8-minesCount == safeCount or effectiveMinesCount == len(unrevealedList)):
             for (r,c) in unrevealedList:
                 self.agentBoard[r][c] = -1;
-                set1.add((r, c))
+                new_neighbours.add((r, c))
                 # newInfo = 1
-        return set1
+        return new_neighbours
 
     def checkInconsistency(self):
         for i in range(self.dimension):
