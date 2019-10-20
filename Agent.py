@@ -14,14 +14,16 @@ class Agent:
             self.env = env
             self.agentBoard = np.array([-2]*(self.dimension*self.dimension))
             self.agentBoard = np.reshape(self.agentBoard,(self.dimension,self.dimension))
-            self.probabilityMatrix = np.array([1]*(self.dimension*self.dimension))
-            self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))  
+            self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
+            self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
             # self.unRevealedMatrix = np.array([0]*(self.dimension*self.dimension)).reshape(self.dimension,self.dimension)
             # self.effectiveMinesCount = np.array([0]*(self.dimension*self.dimension)).reshape(self.dimension,self.dimension)
             # self.unRevealedCount = np.array([0]*(self.dimension*self.dimension)).reshape(self.dimension,self.dimension)
         else:
             self.dimension = len(env)
-            self.agentBoard = copy.deepCopy(env)
+            self.agentBoard = copy.deepcopy(env)
+            self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
+            self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
 
     def getKnowledge(self,row,column):
         #Unrealved : returns list of coordinates
@@ -146,13 +148,16 @@ class Agent:
         for row in range(self.dimension):
             for col in range(self.dimension):
                 if self.agentBoard[row][col]>=0:
+                    minesCount = self.agentBoard[row][col]
                     unrevealedList, safe_revealed, revealed_mines = self.getKnowledge(row,col)
-                    effectiveMinesCount = minesCount - revealedMines
+                    if(len(unrevealedList) == 0):
+                        continue
+                    effectiveMinesCount = minesCount - revealed_mines
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
                         self.probabilityMatrix[i][j] = min(self.probabilityMatrix[i][j], probability)
 
-    def getMinimumProb(self):
+    def getMinProbability(self):
         minProb = []
         a, b = np.where(self.probabilityMatrix == np.min(self.probabilityMatrix))
         for i in range(a.shape[0]):
