@@ -14,13 +14,20 @@ import Agent
 import Environment
 import strategies
 
+def iteration(agent,x,y):
+    if(agent.agentBoard[x][y] != -2):
+        print("SHOULDN'T COME HERE ERROR!!");
+    agent.agentBoard[x][y] = agent.env.reveal(x,y)
+    agent.updateKnowledge(True)
+    agent.printMinesweeper()
+
 def playMinesweeper(env, getNextCell):
     agent = Agent.Agent(env,0)
     blasts = 0
-    iterations = 0
+    noOfIter = 0
     agent.printMinesweeper();
     while(agent.getUnknownCount() > 0):
-        iterations += 1
+        noOfIter += 1
         (x,y) = getNextCell(agent)
         print("Revealed: "+str(x)+" "+str(y))
         result = agent.env.reveal(x,y)

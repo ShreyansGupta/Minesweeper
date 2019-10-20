@@ -7,11 +7,6 @@ import pickle
 import minesweeper
 import strategies
 
-def iteration(a,x,y):
-	a.agentBoard[x][y] = a.env.reveal(x,y)
-	a.updateKnowledge(True)
-	a.printMinesweeper()
-
 dimension = int(input("dimension: "))
 bombs = int(input("bomb count: "))
 env=Environment.Environment(dimension,bombs)

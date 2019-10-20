@@ -156,7 +156,12 @@ class Agent:
                     effectiveMinesCount = minesCount - revealed_mines
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
-                        self.probabilityMatrix[i][j] = min(self.probabilityMatrix[i][j], probability)
+                        if(self.probabilityMatrix[i][j] == 1):
+                            self.probabilityMatrix[i][j] = probability
+                        else:
+                            self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
+                elif(self.agentBoard[row][col] == -1):
+                    self.probabilityMatrix[row][col] = 2.0
 
     def getMinProbability(self):
         minProb = []
