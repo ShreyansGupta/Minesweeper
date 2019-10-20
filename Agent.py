@@ -51,26 +51,34 @@ class Agent:
         # safe_revealed = revealed - revealed_mines - safe_
         return (unrevealed, safe_revealed+safe_unrevealed, revealed_mines)
 
-    def updateKnowledge(self, query):
+    def updateKnowledge(self,i,j,val, query):
+        self.agentBoard[i][j]=val
         noOfIter = 0
-        while(self.updateKnowledgeIter() > 0):
-            if(query):
-                self.querySafeCells()
+        currSet1=set()
+        currSet1.add((i,j))
+        while(currSet1):
+            x,y=currSet1.pop()
+            updated_set = self.updateNeighbours(x, y)
+            currSet1 = currSet1+updated_set
+            while (updated_set):
+                if query:
+                    p, q = updated_set.pop()
+                    self.querySafeCells(p,q)
+
             noOfIter += 1
         return noOfIter
 
-    def querySafeCells(self):
-        for i in range(self.dimension):
-            for j in range(self.dimension):
-                if(self.agentBoard[i][j] == -3):
-                    self.agentBoard[i][j] = self.env.reveal(i,j)
+    def querySafeCells(self, row, column):
+        if(self.agentBoard[row][column] == -3):
+            self.agentBoard[i][j] = self.env.reveal(i,j)
           
-    def updateKnowledgeIter(self):
-        count = 0
-        for i in range(self.dimension):
-            for j in range(self.dimension):
-                count += self.updateNeighbours(i,j)
-        return count;
+    # def updateKnowledgeIter(self,query,prevSet):
+    #     # count = 0
+    #     while(prevSet):
+    #         i,j=prevSet.pop()
+    #         a=self.updateNeighbours(i,j)
+    #
+    #     return set1;
 
     def printMinesweeper(self):
         print("<<<<<<<<<<<<<<<start>>>>>>>>>>>>>>>>")
@@ -95,22 +103,25 @@ class Agent:
         return count;
 
     def updateNeighbours(self, row, column):
+        updated_neighbours=set()
         minesCount = self.agentBoard[row][column]
         if(minesCount < 0):
             return 0
         (unrevealedList,safeCount,revealedMines) = self.getKnowledge(row, column)
         effectiveMinesCount = minesCount - revealedMines
-        newInfo = 0;
+        # newInfo = 0;
         if(minesCount == revealedMines):
             for (r,c) in unrevealedList:
                 # Safe to query these elements
                 self.agentBoard[r][c] = -3;
-                newInfo = 1
+                updated_neighbours.add((r,c))
+                # newInfo = 1
         if(8-minesCount == safeCount or effectiveMinesCount == len(unrevealedList)):
             for (r,c) in unrevealedList:
                 self.agentBoard[r][c] = -1;
-                newInfo = 1
-        return newInfo
+                updated_neighbours.add((r, c))
+                # newInfo = 1
+        return updated_neighbours
 
     def checkInconsistency(self):
         for i in range(self.dimension):
