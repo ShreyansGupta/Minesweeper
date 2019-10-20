@@ -162,3 +162,11 @@ class Agent:
         for i in range(a.shape[0]):
             minProb.append((a[i],b[i]))
         return minProb
+
+    def getRandomNextCell(self):
+        x = int(random.uniform(0,self.dimension))
+        y = int(random.uniform(0,self.dimension))
+        while(self.agentBoard[x][y] != -2):
+            x = int(random.uniform(0,self.dimension))
+            y = int(random.uniform(0,self.dimension))
+        return (x,y)
