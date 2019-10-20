@@ -128,17 +128,16 @@ class Agent:
             self.agentBoard[row][column] = -1
             return True
         else:
-            isNotMine = copyBoard.checkSatVal(row, column, -1)
+            isNotMine = self.checkSatVal(row, column, -1)
             if(isNotMine):
                 self.agentBoard[row][column] = -3
                 return True
             else:
                 return False             
 
-    def checkSatVal(row, column, val):
+    def checkSatVal(self, row, column, val):
         copyBoard = Agent(self.agentBoard, 1)
-        copyBoard.agentBoard[i][j]=val
-        copyBoard.updateKnowledge(False)
+        copyBoard.updateKnowledge(row, column, val, False)
         return copyBoard.checkInconsistency()
 
     def updateProbability(self):
