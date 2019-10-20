@@ -12,21 +12,24 @@ import random
 import copy
 import Agent
 import Environment
+import strategies
 
-def playMineSweeper(env, getNextCell):
+def playMinesweeper(env, getNextCell):
     agent = Agent.Agent(env,0)
     blasts = 0
     iterations = 0
     agent.printMinesweeper();
     while(agent.getUnknownCount() > 0):
         iterations += 1
-        (x,y) = agent.getNextCell()
+        (x,y) = getNextCell(agent)
+        print("Revealed: "+str(x)+" "+str(y))
         result = agent.env.reveal(x,y)
         if(result == -1):
             print("Bomb blast")
             blasts += 1
         agent.agentBoard[x][y] = result
         agent.updateKnowledge(True)
-        agent.printMinesweeper()
+        # agent.printMinesweeper()
+    agent.printMinesweeper()
     return blasts
 

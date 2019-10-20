@@ -73,6 +73,7 @@ class Agent:
         return count;
 
     def printMinesweeper(self):
+        print("<<<<<<<<<<<<<<<start>>>>>>>>>>>>>>>>")
         for i in range(self.dimension):
             string = ""
             for j in range(self.dimension):
@@ -82,7 +83,8 @@ class Agent:
                     string += ("* ")
                 else:
                     string += str(self.agentBoard[i][j]) + " " 
-            print(string+"\n")   
+            print(string+"\n")
+        print("<<<<<<<<<<<<<<<<end>>>>>>>>>>>>>>>>>")
 
     def getUnknownCount(self):
         count = 0;
@@ -158,15 +160,8 @@ class Agent:
 
     def getMinProbability(self):
         minProb = []
+        self.updateProbability()
         a, b = np.where(self.probabilityMatrix == np.min(self.probabilityMatrix))
         for i in range(a.shape[0]):
             minProb.append((a[i],b[i]))
         return minProb
-
-    def getRandomNextCell(self):
-        x = int(random.uniform(0,self.dimension))
-        y = int(random.uniform(0,self.dimension))
-        while(self.agentBoard[x][y] != -2):
-            x = int(random.uniform(0,self.dimension))
-            y = int(random.uniform(0,self.dimension))
-        return (x,y)
