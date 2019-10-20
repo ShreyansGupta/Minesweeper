@@ -61,10 +61,15 @@ class Agent:
             updated_set = self.updateNeighbours(x, y)
             currSet1 = currSet1+updated_set
             while (updated_set):
+                p, q = updated_set.pop()
                 if query:
                     p, q = updated_set.pop()
                     self.querySafeCells(p,q)
-
+                else:
+                    if self.checkInconsistency(p,q)==False:
+                        continue
+                    else:
+                        return -10
             noOfIter += 1
         return noOfIter
 
@@ -123,16 +128,19 @@ class Agent:
                 # newInfo = 1
         return updated_neighbours
 
-    def checkInconsistency(self):
-        for i in range(self.dimension):
-            for j in range(self.dimension):
-                minesCount = self.agentBoard[i][j]
-                if(minesCount < 0):
+    def checkInconsistency(self,row,col):
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if i == 0 or j == 0:
                     continue
-                else:
-                    (unrevealedList,safeCount,revealedMines) = self.getKnowledge(i, j)
-                    if(revealedMines > minesCount):
-                        return True
+                elif 0 <= row + i < self.dimension and 0 <= col + j < self.dimension:
+                    minesCount = self.agentBoard[row+i][col+j]
+                    if(minesCount < 0):
+                        continue
+                    else:
+                        (unrevealedList,safeCount,revealedMines) = self.getKnowledge(i, j)
+                        if(revealedMines > minesCount):
+                            return True
         return False
 
     def checkSat(self, row, column):
