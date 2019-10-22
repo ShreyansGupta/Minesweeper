@@ -127,19 +127,20 @@ class Agent:
     def checkSat(self, row, column):
         isMine = self.checkSatVal(row, column, -3)
         if(isMine):
-            self.agentBoard[row][column] = -1
-            return True
+            # self.agentBoard[row][column] = -1
+            return -1
         else:
             isNotMine = self.checkSatVal(row, column, -1)
             if(isNotMine):
-                self.agentBoard[row][column] = -3
-                return True
+                # self.agentBoard[row][column] = -3
+                return -3
             else:
-                return False             
+                return -2
 
     def checkSatVal(self, row, column, val):
         copyBoard = Agent(self.agentBoard, 1)
-        copyBoard.updateKnowledge(row, column, val, False)
+        copyBoard.agentBoard[row][column] = val
+        copyBoard.updateKnowledge(False)
         return copyBoard.checkInconsistency()
 
     def updateProbability(self):
