@@ -6,6 +6,7 @@
 import numpy as np
 import random
 import copy
+import pdb
 
 class Agent:
     def __init__(self,env,i):
@@ -55,27 +56,26 @@ class Agent:
         self.agentBoard[i][j]=val
         noOfIter = 0
         currSet1=set()
+        changedElements = set()
         currSet1.add((i,j))
+        changedElements.add((i,j))
         while(currSet1):
             x,y=currSet1.pop()
             updated_set = self.updateNeighbours(x, y)
-            currSet1 = currSet1+updated_set
+            # pdb.set_trace()
+            currSet1 = currSet1.union(updated_set)
+            changedElements = changedElements.union(updated_set)
             while (updated_set):
                 p, q = updated_set.pop()
                 if query:
-                    p, q = updated_set.pop()
+                    # p, q = updated_set.pop()
                     self.querySafeCells(p,q)
-                else:
-                    if self.checkInconsistency(p,q)==False:
-                        continue
-                    else:
-                        return -10
             noOfIter += 1
-        return noOfIter
+        return changedElements
 
     def querySafeCells(self, row, column):
         if(self.agentBoard[row][column] == -3):
-            self.agentBoard[i][j] = self.env.reveal(i,j)
+            self.agentBoard[row][column] = self.env.reveal(row,column)
           
     # def updateKnowledgeIter(self,query,prevSet):
     #     # count = 0
@@ -111,7 +111,7 @@ class Agent:
         updated_neighbours=set()
         minesCount = self.agentBoard[row][column]
         if(minesCount < 0):
-            return 0
+            return updated_neighbours
         (unrevealedList,safeCount,revealedMines) = self.getKnowledge(row, column)
         effectiveMinesCount = minesCount - revealedMines
         # newInfo = 0;
@@ -128,7 +128,7 @@ class Agent:
                 # newInfo = 1
         return updated_neighbours
 
-    def checkInconsistency(self,row,col):
+    def checkInconsistencyCell(self,row,col):
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 if i == 0 or j == 0:
@@ -141,6 +141,14 @@ class Agent:
                         (unrevealedList,safeCount,revealedMines) = self.getKnowledge(row+i, col+j)
                         if(revealedMines > minesCount):
                             return True
+        return False
+
+
+    def checkInconsistencySet(self,changedElements):
+        while changedElements:
+            (p,q) = changedElements.pop()
+            if(self.checkInconsistencyCell(p,q)):
+                return True
         return False
 
     def checkSat(self, row, column):
@@ -158,9 +166,9 @@ class Agent:
 
     def checkSatVal(self, row, column, val):
         copyBoard = Agent(self.agentBoard, 1)
-        copyBoard.agentBoard[row][column] = val
-        copyBoard.updateKnowledge(False)
-        return copyBoard.checkInconsistency()
+        # copyBoard.agentBoard[row][column] = val
+        changedElements = copyBoard.updateKnowledge(row,column, val, False)
+        return copyBoard.checkInconsistencySet(changedElements)
 
     def updateProbability(self):
         for row in range(self.dimension):

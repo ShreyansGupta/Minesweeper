@@ -17,8 +17,8 @@ import strategies
 def iteration(agent,x,y):
     if(agent.agentBoard[x][y] != -2):
         print("SHOULDN'T COME HERE ERROR!!");
-    agent.agentBoard[x][y] = agent.env.reveal(x,y)
-    agent.updateKnowledge(True)
+    # agent.agentBoard[x][y] = agent.env.reveal(x,y)
+    agent.updateKnowledge(x,y,agent.env.reveal(x,y),True)
     agent.printMinesweeper()
 
 def playMinesweeper(env, getNextCell):
@@ -34,8 +34,8 @@ def playMinesweeper(env, getNextCell):
         if(result == -1):
             print("Bomb blast")
             blasts += 1
-        agent.agentBoard[x][y] = result
-        agent.updateKnowledge(True)
+        # agent.agentBoard[x][y] = result
+        agent.updateKnowledge(x,y,result,True)
         # agent.printMinesweeper()
     agent.printMinesweeper()
     return blasts
@@ -58,8 +58,8 @@ def playMinesweeperAI(env, getNextCell):
                 blasts += 1
         else:
             result = -1
-        agent.agentBoard[x][y] = result
-        agent.updateKnowledge(True)
+        # agent.agentBoard[x][y] = result
+        agent.updateKnowledge(x,y,result,True)
         # agent.printMinesweeper()
     agent.printMinesweeper()
     return blasts
