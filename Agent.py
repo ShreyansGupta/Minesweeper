@@ -173,28 +173,35 @@ class Agent:
     def updateProbability(self):
         for row in range(self.dimension):
             for col in range(self.dimension):
-                self.probabilityMatrix[row][col] = 1
+                self.probabilityMatrix[row][col] = 2
         for row in range(self.dimension):
             for col in range(self.dimension):
-                if self.agentBoard[row][col]>=0:
+                unrevealedList, safe_revealed, revealed_mines = self.getKnowledge(row,col)
+                if self.agentBoard[row][col]>=0 and len(unrevealedList) != 0:
                     minesCount = self.agentBoard[row][col]
-                    unrevealedList, safe_revealed, revealed_mines = self.getKnowledge(row,col)
-                    if(len(unrevealedList) == 0):
-                        continue
                     effectiveMinesCount = minesCount - revealed_mines
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
-                        if(self.probabilityMatrix[i][j] == 1):
+                        if(self.probabilityMatrix[i][j] == 2):
                             self.probabilityMatrix[i][j] = probability
                         else:
                             self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
                 elif(self.agentBoard[row][col] == -1):
-                    self.probabilityMatrix[row][col] = 2.0
+                    self.probabilityMatrix[row][col] = 3.0
+
+    def getMinProbabilityAll(self):
+        minProb = []
+        self.updateProbability()
+        (a,b) = np.where(self.probabilityMatrix <= 1)
+        for i in range(len(a)):
+            minProb.append((self.probabilityMatrix[a[i]][b[i]],a[i],b[i]))
+        minProb.sort()
+        return minProb
 
     def getMinProbability(self, noOfMin):
         minProb = []
         self.updateProbability()
-        (a,b) = np.where(self.probabilityMatrix < 1)
+        (a,b) = np.where(self.probabilityMatrix <= 1)
         for i in range(len(a)):
             minProb.append((self.probabilityMatrix[a[i]][b[i]],a[i],b[i]))
         minProb.sort()

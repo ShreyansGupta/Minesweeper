@@ -50,17 +50,21 @@ def playMinesweeperAI(env, getNextCell):
     while(agent.getUnknownCount() > 0):
         noOfIter += 1
         (res,x,y) = getNextCell(agent)
-        print("Revealed: "+str(x)+" "+str(y))
+        resultString = "Revealed: "+str(x)+" "+str(y)+" "
         if(res == -2 or res == -3):
             result = agent.env.reveal(x,y)
             if(result == -1):
-                print("Bomb blast")
+                resultString += "Bomb blast"
                 blasts += 1
+            elif(res == -3):
+                resultString += "Found safe cell"
         else:
+            resultString += "Found Bomb"
             result = -1
         # agent.agentBoard[x][y] = result
+        print(resultString)
         agent.updateKnowledge(x,y,result,True)
-        # agent.printMinesweeper()
+        agent.printMinesweeper()
     agent.printMinesweeper()
     return blasts
 
