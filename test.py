@@ -20,3 +20,4 @@ env=Environment.Environment(dimension,bombs)
 # print("getMinProbCell score : "+str(float(bombs-blasts)/bombs))
 blasts = minesweeper.playMinesweeperAI(env, strategies.getCheckSATCell)
 print("getMinProbCell score : "+str(float(bombs-blasts)/bombs))
+

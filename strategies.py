@@ -53,7 +53,7 @@ def getCheckSATCell(agent):
 				continue
 			else:
 				print("AI got a clue"+str((result,rx,ry)))
-				return (result,rx,ry)
+				return` (result,rx,ry)
 	(p,rx,ry) = minProbList[0]
 	return (-2,rx,ry)
 #
