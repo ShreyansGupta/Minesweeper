@@ -143,8 +143,15 @@ class Agent:
                         continue
                     else:
                         (unrevealedList,safeCount,revealedMines) = self.getKnowledge(row+i, col+j)
-                        if(revealedMines > minesCount):
+                        effectiveMinesCount = minesCount - revealedMines
+                        if(len(unrevealedList) == 0 and effectiveMinesCount != 0):
                             return True
+                        elif(len(unrevealedList) == 0):
+                            continue
+                        else:
+                            prob = float(effectiveMinesCount)/float(len(unrevealedList))
+                            if(prob < 0 or prob > 1):
+                                return True
         return False
 
     #Consistency of all the Changed Elements are checked
