@@ -164,10 +164,25 @@ class Agent:
                 elif(self.agentBoard[row][col] == -1):
                     self.probabilityMatrix[row][col] = 2.0
 
-    def getMinProbability(self):
+    def getMinProbability(self, noOfMin):
         minProb = []
         self.updateProbability()
-        a, b = np.where(self.probabilityMatrix == np.min(self.probabilityMatrix))
-        for i in range(a.shape[0]):
-            minProb.append((a[i],b[i]))
-        return minProb
+        (a,b) = np.where(self.probabilityMatrix < 1)
+        for i in range(len(a)):
+            minProb.append((self.probabilityMatrix[a[i]][b[i]],a[i],b[i]))
+        minProb.sort()
+        return minProb[:noOfMin]
+
+    def getEffectiveMines(self,row,column):
+        if(self.agentBoard[row][column] < 0):
+            print("ERROR SHOULDN'T COME HERE")
+            exit()
+        revealed_mines = 0
+        for i in [-1,0,1]:
+            for j in [-1,0,1]:
+                if(i == 0 and j == 0):
+                    continue;
+                elif 0<=row+i<self.dimension and 0<=column+j<self.dimension :
+                    if self.agentBoard[row+i][column+j] == -1:
+                        revealed_mines +=1
+        return self.agentBoard[row][column] - revealed_mines
