@@ -27,5 +27,5 @@ class Environment:
                 elif 0<=row+i<self.dimension and 0<=column+j<self.dimension :
                     if self.mazeCells[row+i][column+j] == -1:
                         count +=1
-        self.mazeCells[row][column] == count;
+        self.mazeCells[row][column] = count;
         return count
