@@ -2,13 +2,13 @@ import Agent
 import random
 import numpy as np
 import pdb
-
+# Random cell to be chosen and revealed
 def getFirstRandomNextCell(agent):
 	x = int(random.uniform(0,agent.dimension))
 	y = int(random.uniform(0,agent.dimension))
 	agent.env.reveal(x,y,True);
 	return (x,y)
-
+# Choose Random cell which is set as -2(Value unknown)
 def getRandomNextCell(agent):
     x = int(random.uniform(0,agent.dimension))
     y = int(random.uniform(0,agent.dimension))
@@ -16,13 +16,16 @@ def getRandomNextCell(agent):
         x = int(random.uniform(0,agent.dimension))
         y = int(random.uniform(0,agent.dimension))
     return (x,y)
-
+# Takes minimum probability list and Chooses the cell with minimum value in UnrevealedCountList
+# UnrevealedCountList contains count of unrevealed cell,safe cells and revealed mines
+# One of the strategy for forward propagation
 def getMinProbCell(agent):
 	noOfMin = 10
 	minProbList = agent.getMinProbability(noOfMin)
 	unrevealedCountList = list(len(agent.getKnowledge(i,j)[0]) for (p,i,j) in minProbList)
 	return minProbList[unrevealedCountList.index(min(unrevealedCountList))][1:]
-
+# One of the strategy for forward propagation
+# Gives cell with minimum Effective Mines
 def getMinEffectiveMines(agent):
     minEffectiveMines = []
     (xList,yList) = np.where(agent.agentBoard >= 1)
@@ -53,8 +56,8 @@ def getCheckSATCell(agent):
 				return (result,rx,ry)
 	(p,rx,ry) = minProbList[0]
 	return (-2,rx,ry)
-
-def getSomething(agent):
-	noOfCheckSATCandidates = 10
-	minProbList = agent.getMinProbability(noOfCheckSATCandidates)
-	unrevealedCountList = list((len(agent.getKnowledge(i,j)),i,j) for (p,i,j) in minProbList).sort()
+#
+# def getSomething(agent):
+# 	noOfCheckSATCandidates = 10
+# 	minProbList = agent.getMinProbability(noOfCheckSATCandidates)
+# 	unrevealedCountList = list((len(agent.getKnowledge(i,j)),i,j) for (p,i,j) in minProbList).sort()

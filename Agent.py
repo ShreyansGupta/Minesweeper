@@ -7,7 +7,9 @@ import numpy as np
 import random
 import copy
 import pdb
-
+# Class for Agent Board and actions it can perform
+# Agent Board is the matrix on which Agent will play
+# Probability Matrix maintains the probability of mine at each cell
 class Agent:
     def __init__(self,env,i):
         if i==0:
@@ -17,21 +19,21 @@ class Agent:
             self.agentBoard = np.reshape(self.agentBoard,(self.dimension,self.dimension))
             self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
             self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
-            # self.unRevealedMatrix = np.array([0]*(self.dimension*self.dimension)).reshape(self.dimension,self.dimension)
-            # self.effectiveMinesCount = np.array([0]*(self.dimension*self.dimension)).reshape(self.dimension,self.dimension)
-            # self.unRevealedCount = np.array([0]*(self.dimension*self.dimension)).reshape(self.dimension,self.dimension)
+
         else:
+            # This is for creating copy of agent board to check satisfiablity of assumption we take
+            # Probability Matrix for copy board to choose minimum probability neighbor to proceed
             self.dimension = len(env)
             self.agentBoard = copy.deepcopy(env)
             self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
             self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
 
+    # This method returns unrevealed neighbors of a cell,total safe neighbors and revealed mines
     def getKnowledge(self,row,column):
         #Unrealved : returns list of coordinates
         #revealed = 8-len(unrevealed)  
         #count_revealed: revealed - revealed mines
         unrevealed = []
-        revealed = 0
         revealed_mines = 0
         safe_unrevealed = 0
         safe_revealed = 0
@@ -52,6 +54,10 @@ class Agent:
         # safe_revealed = revealed - revealed_mines - safe_
         return (unrevealed, safe_revealed+safe_unrevealed, revealed_mines)
 
+    # We get list of neighbours we can query( because safe) or those for which we know they have mine
+    # After updating those cells we will update our knowledge in nearby neighbors
+    # Returns all the changed elements
+
     def updateKnowledge(self,i,j,val, query):
         self.agentBoard[i][j]=val
         noOfIter = 0
@@ -68,23 +74,16 @@ class Agent:
             while (updated_set):
                 p, q = updated_set.pop()
                 if query:
-                    # p, q = updated_set.pop()
                     self.querySafeCells(p,q)
             noOfIter += 1
         return changedElements
 
+    # After identifying safe cell we will query it to reveal the count of mines around it
     def querySafeCells(self, row, column):
         if(self.agentBoard[row][column] == -3):
             self.agentBoard[row][column] = self.env.reveal(row,column)
           
-    # def updateKnowledgeIter(self,query,prevSet):
-    #     # count = 0
-    #     while(prevSet):
-    #         i,j=prevSet.pop()
-    #         a=self.updateNeighbours(i,j)
-    #
-    #     return set1;
-
+    # Method to Print the Agent Board( Minesweeper)
     def printMinesweeper(self):
         print("<<<<<<<<<<<<<<<start>>>>>>>>>>>>>>>>")
         for i in range(self.dimension):
@@ -99,6 +98,7 @@ class Agent:
             print(string+"\n")
         print("<<<<<<<<<<<<<<<<end>>>>>>>>>>>>>>>>>")
 
+    # Returns number of cells whose information is not known
     def getUnknownCount(self):
         count = 0;
         for i in range(self.dimension):
@@ -106,7 +106,7 @@ class Agent:
                 if self.agentBoard[i][j] == -2:
                     count += 1;
         return count;
-
+    # This method returns list of updated neighbors
     def updateNeighbours(self, row, column):
         updated_neighbours=set()
         minesCount = self.agentBoard[row][column]
@@ -115,12 +115,14 @@ class Agent:
         (unrevealedList,safeCount,revealedMines) = self.getKnowledge(row, column)
         effectiveMinesCount = minesCount - revealedMines
         # newInfo = 0;
+        # if mines count is equal to revealedMines then all remaining are safe and can be queried
         if(minesCount == revealedMines):
             for (r,c) in unrevealedList:
                 # Safe to query these elements
                 self.agentBoard[r][c] = -3;
                 updated_neighbours.add((r,c))
                 # newInfo = 1
+        # Adding neighbors who are definately a mine to reveal them
         if(8-minesCount == safeCount or effectiveMinesCount == len(unrevealedList)):
             for (r,c) in unrevealedList:
                 self.agentBoard[r][c] = -1;
@@ -128,6 +130,8 @@ class Agent:
                 # newInfo = 1
         return updated_neighbours
 
+    # when exploring on copy matrix by assumption this method tells us if there is inconsistency with our knowledge
+    # Returns True if there is an inconsistency and vice versa
     def checkInconsistencyCell(self,row,col):
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
@@ -143,33 +147,34 @@ class Agent:
                             return True
         return False
 
-
+    #Consistency of all the Changed Elements are checked
     def checkInconsistencySet(self,changedElements):
         while changedElements:
             (p,q) = changedElements.pop()
             if(self.checkInconsistencyCell(p,q)):
                 return True
         return False
-
+    # Satisfiability of each cell is checked by putting it safe and then mine if safe fails
     def checkSat(self, row, column):
-        isMine = self.checkSatVal(row, column, -3)
+        isMine = self.checkSatVal(row, column, -3)      #Setting the cell safe
         if(isMine):
             # self.agentBoard[row][column] = -1
             return -1
         else:
-            isNotMine = self.checkSatVal(row, column, -1)
+            isNotMine = self.checkSatVal(row, column, -1)       #Setting the cell Mine
             if(isNotMine):
                 # self.agentBoard[row][column] = -3
                 return -3
             else:
-                return -2
-
+                return -2                                   #Set -2 if unclear
+    # Start of checking satisfiability of an element on substituting it mine or safe cell
     def checkSatVal(self, row, column, val):
-        copyBoard = Agent(self.agentBoard, 1)
+        copyBoard = Agent(self.agentBoard, 1) #Create a copy board
         # copyBoard.agentBoard[row][column] = val
-        changedElements = copyBoard.updateKnowledge(row,column, val, False)
+        changedElements = copyBoard.updateKnowledge(row,column, val, False)     #Updating copy board neighbors
         return copyBoard.checkInconsistencySet(changedElements)
 
+    # Updating Probability of each cell based on effectiveMinesCount and UnrevealedList
     def updateProbability(self):
         for row in range(self.dimension):
             for col in range(self.dimension):
@@ -188,7 +193,7 @@ class Agent:
                             self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
                 elif(self.agentBoard[row][col] == -1):
                     self.probabilityMatrix[row][col] = 3.0
-
+    # All cells with probability less than 1
     def getMinProbabilityAll(self):
         minProb = []
         self.updateProbability()
@@ -197,7 +202,7 @@ class Agent:
             minProb.append((self.probabilityMatrix[a[i]][b[i]],a[i],b[i]))
         minProb.sort()
         return minProb
-
+    # Gives minimum probability cells for given number of count
     def getMinProbability(self, noOfMin):
         minProb = []
         self.updateProbability()
@@ -206,7 +211,7 @@ class Agent:
             minProb.append((self.probabilityMatrix[a[i]][b[i]],a[i],b[i]))
         minProb.sort()
         return minProb[:noOfMin]
-
+    # Gives number of effectivemines around a cell(Total-revealed)
     def getEffectiveMines(self,row,column):
         if(self.agentBoard[row][column] < 0):
             print("ERROR SHOULDN'T COME HERE")
