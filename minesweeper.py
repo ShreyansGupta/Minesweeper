@@ -68,7 +68,8 @@ def playMinesweeperAI(env, getNextCell):
         # agent.agentBoard[x][y] = result
         print(resultString)
         agent.updateKnowledge(x,y,result,True)  # The agent updates its knowledge based on the information it recieved from its move.
-        agent.printMinesweeper()
+        agent.expandInference()
+        # agent.printMinesweeper()
     agent.printMinesweeper()
     return blasts
 

@@ -218,7 +218,17 @@ class Agent:
             minProb.append((self.probabilityMatrix[a[i]][b[i]],a[i],b[i]))
         minProb.sort()
         return minProb[:noOfMin]
-    # Gives number of effectivemines around a cell(Total-revealed)
+    
+    def expandInference(self):
+        minProbList = self.getMinProbabilityAll()
+        bombs = [(x,y) for (p,x,y) in minProbList if p == 1]
+        for (x,y) in bombs:
+            self.updateKnowledge(x,y,-1,True)
+        safes = [(x,y) for (p,x,y) in minProbList if p == 0]
+        for (x,y) in safes:
+            self.updateKnowledge(x,y,self.env.reveal(x,y),True)
+
+# Gives number of effectivemines around a cell(Total-revealed)    
     def getEffectiveMines(self,row,column):
         if(self.agentBoard[row][column] < 0):
             print("ERROR SHOULDN'T COME HERE")
