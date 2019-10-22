@@ -4,7 +4,7 @@ import copy
 import Agent
 import Environment
 
-bombs = 10;
+bombs = 10
 env=Environment.Environment(5,bombs)
 a=Agent.Agent(env,0)
 blasts = 0
