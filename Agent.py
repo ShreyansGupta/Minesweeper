@@ -138,7 +138,7 @@ class Agent:
                     if(minesCount < 0):
                         continue
                     else:
-                        (unrevealedList,safeCount,revealedMines) = self.getKnowledge(i, j)
+                        (unrevealedList,safeCount,revealedMines) = self.getKnowledge(row+i, col+j)
                         if(revealedMines > minesCount):
                             return True
         return False
