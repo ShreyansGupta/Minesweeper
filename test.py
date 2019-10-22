@@ -10,11 +10,13 @@ import strategies
 dimension = int(input("dimension: "))
 bombs = int(input("bomb count: "))
 env=Environment.Environment(dimension,bombs)
-agent=Agent.Agent(env,0)
+# agent=Agent.Agent(env,0)
 # blasts = 0
 # iterations = 0
 # a.printMinesweeper();
 # blasts = minesweeper.playMinesweeper(env, strategies.getRandomNextCell)
 # print("getRandomNextCell score : "+str(float(bombs-blasts)/bombs))
 # blasts = minesweeper.playMinesweeper(env, strategies.getMinProbCell)
-# print("getRandomNextCell score : "+str(float(bombs-blasts)/bombs))
+# print("getMinProbCell score : "+str(float(bombs-blasts)/bombs))
+blasts = minesweeper.playMinesweeperAI(env, strategies.getCheckSATCell)
+print("getMinProbCell score : "+str(float(bombs-blasts)/bombs))
