@@ -35,25 +35,15 @@ def getMinEffectiveMines(agent):
     return (x,y)
 
 def getCheckSATCell(agent):
-	# minEffectiveMines = []
-	# (xList,yList) = np.where(agent.agentBoard >= 1)
-	# for i in range(len(xList)):
-	#     minEffectiveMines.append((agent.getEffectiveMines(xList[i],yList[i]),xList[i],yList[i]))
-	# minEffectiveMines.sort()
 	minProbList = agent.getMinProbabilityAll()
-	# bombs = [(x,y) for (p,x,y) in minProbList if p == 1]
-	# safes = [(x,y) for (p,x,y) in minProbList if p == 0]
 	candidates = list(set(minProbList[:5]).union(set(minProbList[-5:])))
-	for (p,x,y) in candidates:
-		unrevealedList, safe, revealedMines = agent.getKnowledge(x,y)
-		# print(unrevealedList)
-		for (rx,ry) in unrevealedList:
-			result = agent.checkSat(rx,ry)
-			if(result == -2):
-				continue
-			else:
-				print("AI got a clue"+str((result,rx,ry)))
-				return` (result,rx,ry)
+	for (p,rx,ry) in candidates:
+		result = agent.checkSat(rx,ry)
+		if(result == -2):
+			continue
+		else:
+			print("AI got a clue"+str((result,rx,ry)))
+			return (result,rx,ry)
 	(p,rx,ry) = minProbList[0]
 	return (-2,rx,ry)
 #
