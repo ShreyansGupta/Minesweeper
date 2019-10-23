@@ -6,6 +6,7 @@ import Agent
 import pickle
 import minesweeper
 import strategies
+import time
 
 dimension = int(input("dimension: "))
 bombs = int(input("bomb count: "))
@@ -18,6 +19,8 @@ env=Environment.Environment(dimension,bombs)
 # print("getRandomNextCell score : "+str(float(bombs-blasts)/bombs))
 # blasts = minesweeper.playMinesweeper(env, strategies.getMinProbCell)
 # print("getMinProbCell score : "+str(float(bombs-blasts)/bombs))
+startTime = time.time()
 blasts = minesweeper.playMinesweeperAI(env, strategies.getCheckSATCell)
-print("getMinProbCell score : "+str(float(bombs-blasts)/bombs))
-
+endTime = time.time()
+print("Total time : "+str(endTime-startTime))
+print("getCheckSATCell score : "+str(float(bombs-blasts)/bombs))

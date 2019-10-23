@@ -16,6 +16,14 @@ def getRandomNextCell(agent):
         x = int(random.uniform(0,agent.dimension))
         y = int(random.uniform(0,agent.dimension))
     return (x,y)
+
+def getUnrevealedCell(agent):
+	for i in range(agent.dimension):
+		for j in range(agent.dimension):
+			if(agent.agentBoard[i][j] == -2):
+				return (i,j)
+	return (-1,-1)
+
 # Takes minimum probability list and Chooses the cell with minimum value in UnrevealedCountList
 # UnrevealedCountList contains count of unrevealed cell,safe cells and revealed mines
 # One of the strategy for forward propagation
@@ -37,6 +45,7 @@ def getMinEffectiveMines(agent):
 def getCheckSATCell(agent):
 	minProbList = agent.getMinProbabilityAll()
 	candidates = list(set(minProbList[:5]).union(set(minProbList[-5:])))
+	candidates.sort()
 	for (p,rx,ry) in candidates:
 		result = agent.checkSat(rx,ry)
 		if(result == -2):
@@ -44,7 +53,12 @@ def getCheckSATCell(agent):
 		else:
 			print("AI got a clue"+str((result,rx,ry)))
 			return (result,rx,ry)
-	(p,rx,ry) = minProbList[0]
+	if(len(minProbList) != 0):
+		(p,rx,ry) = minProbList[0]
+	else:
+		(rx, ry) = getUnrevealedCell(agent)
+		if(rx == -1):
+			print("ERROR SHOULDN'T COME HERE!!")
 	return (-2,rx,ry)
 #
 # def getSomething(agent):
