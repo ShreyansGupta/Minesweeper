@@ -28,10 +28,12 @@ def getUnrevealedCell(agent):
 # UnrevealedCountList contains count of unrevealed cell,safe cells and revealed mines
 # One of the strategy for forward propagation
 def getMinProbCell(agent):
-	noOfMin = 10
-	minProbList = agent.getMinProbability(noOfMin)
+	minProbList = agent.getMinProbability(10)
+	if(len(minProbList) == 0):
+		return getUnrevealedCell(agent)
 	unrevealedCountList = list(len(agent.getKnowledge(i,j)[0]) for (p,i,j) in minProbList)
-	return minProbList[unrevealedCountList.index(min(unrevealedCountList))][1:]
+	unrevealedCountList.sort()
+	return minProbList[0][1:]
 # One of the strategy for forward propagation
 # Gives cell with minimum Effective Mines
 def getMinEffectiveMines(agent):
@@ -42,6 +44,8 @@ def getMinEffectiveMines(agent):
     (minEffMineCount,x,y) = minEffectiveMines.sort()[0]
     return (x,y)
 
+# This strategy selects 5 least probability cells and 5 max probability cells and checks satisfyability for them
+# and returns if found any inconsistency if not found any inconsistency then return minimum probability cell
 def getCheckSATCell(agent):
 	minProbList = agent.getMinProbabilityAll()
 	candidates = list(set(minProbList[:5]).union(set(minProbList[-5:])))
@@ -60,8 +64,3 @@ def getCheckSATCell(agent):
 		if(rx == -1):
 			print("ERROR SHOULDN'T COME HERE!!")
 	return (-2,rx,ry)
-#
-# def getSomething(agent):
-# 	noOfCheckSATCandidates = 10
-# 	minProbList = agent.getMinProbability(noOfCheckSATCandidates)
-# 	unrevealedCountList = list((len(agent.getKnowledge(i,j)),i,j) for (p,i,j) in minProbList).sort()
