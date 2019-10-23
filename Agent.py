@@ -19,6 +19,9 @@ class Agent:
             self.agentBoard = np.reshape(self.agentBoard,(self.dimension,self.dimension))
             self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
             self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
+            # Now we know count of total mines
+            self.totalMines = env.no_of_mines
+            self.effectiveTotalMines = env.no_of_mines
 
         else:
             # This is for creating copy of agent board to check satisfiablity of assumption we take
@@ -57,9 +60,13 @@ class Agent:
     # We get list of neighbours we can query( because safe) or those for which we know they have mine
     # After updating those cells we will update our knowledge in nearby neighbors
     # Returns all the changed elements
+    # If query is false then we are just expanding our knowledge base and checking satisfiablity
+    # with assumption so cells those which are marked as safe (-3) shouldn't be queried.
 
     def updateKnowledge(self,i,j,val, query):
         self.agentBoard[i][j]=val
+        if(query and val == -1):
+            self.effectiveTotalMines -= 1
         noOfIter = 0
         currSet1=set()
         changedElements = set()
@@ -183,9 +190,10 @@ class Agent:
 
     # Updating Probability of each cell based on effectiveMinesCount and UnrevealedList
     def updateProbability(self):
+        unrevealedCount = self.getUnknownCount()
         for row in range(self.dimension):
             for col in range(self.dimension):
-                self.probabilityMatrix[row][col] = 2
+                self.probabilityMatrix[row][col] = float(self.effectiveTotalMines)/float(unrevealedCount)
         for row in range(self.dimension):
             for col in range(self.dimension):
                 unrevealedList, safe_revealed, revealed_mines = self.getKnowledge(row,col)
@@ -194,10 +202,7 @@ class Agent:
                     effectiveMinesCount = minesCount - revealed_mines
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
-                        if(self.probabilityMatrix[i][j] == 2):
-                            self.probabilityMatrix[i][j] = probability
-                        else:
-                            self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
+                        self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
                 elif(self.agentBoard[row][col] == -1):
                     self.probabilityMatrix[row][col] = 3.0
     # All cells with probability less than 1
