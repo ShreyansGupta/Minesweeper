@@ -11,7 +11,7 @@ import pdb
 # Agent Board is the matrix on which Agent will play
 # Probability Matrix maintains the probability of mine at each cell
 class Agent:
-    def __init__(self,env,i):
+    def __init__(self,env,i, improve= False):
         if i==0:
             self.dimension=env.dimension
             self.env = env
@@ -19,17 +19,23 @@ class Agent:
             self.agentBoard = np.reshape(self.agentBoard,(self.dimension,self.dimension))
             self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
             self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
+            self.improvement = improve
             # Now we know count of total mines
-            self.totalMines = env.no_of_mines
-            self.effectiveTotalMines = env.no_of_mines
+            if(self.improvement):
+                self.totalMines = env.no_of_mines
+                self.effectiveTotalMines = env.no_of_mines
 
-        else:
+        elif i == 1:
             # This is for creating copy of agent board to check satisfiablity of assumption we take
             # Probability Matrix for copy board to choose minimum probability neighbor to proceed
-            self.dimension = len(env)
-            self.agentBoard = copy.deepcopy(env)
+            self.dimension = len(env.agentBoard)
+            self.agentBoard = copy.deepcopy(env.agentBoard)
             self.probabilityMatrix = np.array([1.0]*(self.dimension*self.dimension), dtype= float)
             self.probabilityMatrix = np.reshape(self.probabilityMatrix, (self.dimension,self.dimension))
+            self.improvement = env.improvement
+            if(self.improvement):
+                self.totalMines = env.env.no_of_mines
+                self.effectiveTotalMines = env.env.no_of_mines
 
     # This method returns unrevealed neighbors of a cell,total safe neighbors and revealed mines
     def getKnowledge(self,row,column):
@@ -65,7 +71,7 @@ class Agent:
 
     def updateKnowledge(self,i,j,val, query):
         self.agentBoard[i][j]=val
-        if(query and val == -1):
+        if(self.improvement and query and val == -1):
             self.effectiveTotalMines -= 1
         noOfIter = 0
         currSet1=set()
@@ -183,7 +189,7 @@ class Agent:
                 return -2                                   #Set -2 if unclear
     # Start of checking satisfiability of an element on substituting it mine or safe cell
     def checkSatVal(self, row, column, val):
-        copyBoard = Agent(self.agentBoard, 1) #Create a copy board
+        copyBoard = Agent(self, 1) #Create a copy board
         # copyBoard.agentBoard[row][column] = val
         changedElements = copyBoard.updateKnowledge(row,column, val, False)     #Updating copy board neighbors
         return copyBoard.checkInconsistencySet(changedElements)
@@ -193,7 +199,11 @@ class Agent:
         unrevealedCount = self.getUnknownCount()
         for row in range(self.dimension):
             for col in range(self.dimension):
-                self.probabilityMatrix[row][col] = float(self.effectiveTotalMines)/float(unrevealedCount)
+                if(self.improvement):
+                    self.probabilityMatrix[row][col] = float(self.effectiveTotalMines)/float(unrevealedCount)
+                else:
+                    self.probabilityMatrix[row][col] = 2
+        # pdb.set_trace()
         for row in range(self.dimension):
             for col in range(self.dimension):
                 unrevealedList, safe_revealed, revealed_mines = self.getKnowledge(row,col)
@@ -202,7 +212,13 @@ class Agent:
                     effectiveMinesCount = minesCount - revealed_mines
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
-                        self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
+                        if(self.improvement):
+                            self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
+                        else:
+                            if(self.probabilityMatrix[i][j] == 2):
+                                self.probabilityMatrix[i][j] = probability
+                            else:
+                                self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
                 elif(self.agentBoard[row][col] == -1):
                     self.probabilityMatrix[row][col] = 3.0
     # All cells with probability less than 1
