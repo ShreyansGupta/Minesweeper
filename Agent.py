@@ -12,7 +12,7 @@ import pdb
 # Probability Matrix maintains the probability of mine at each cell
 class Agent:
     def __init__(self,env,i, improve= False):
-        if i==0:
+        if i == 0:
             self.dimension=env.dimension
             self.env = env
             self.agentBoard = np.array([-2]*(self.dimension*self.dimension))
@@ -71,7 +71,7 @@ class Agent:
 
     def updateKnowledge(self,i,j,val, query):
         self.agentBoard[i][j]=val
-        if(self.improvement and query and val == -1):
+        if(self.improvement and val == -1):
             self.effectiveTotalMines -= 1
         noOfIter = 0
         currSet1=set()
@@ -136,8 +136,10 @@ class Agent:
                 updated_neighbours.add((r,c))
                 # newInfo = 1
         # Adding neighbors who are definately a mine to reveal them
-        if(8-minesCount == safeCount or effectiveMinesCount == len(unrevealedList)):
+        if(effectiveMinesCount == len(unrevealedList)):
             for (r,c) in unrevealedList:
+                if(self.improvement):
+                    self.effectiveTotalMines -= 1
                 self.agentBoard[r][c] = -1;
                 updated_neighbours.add((r, c))
                 # newInfo = 1
@@ -199,7 +201,7 @@ class Agent:
         unrevealedCount = self.getUnknownCount()
         for row in range(self.dimension):
             for col in range(self.dimension):
-                if(self.improvement):
+                if(self.improvement and self.agentBoard[row][col] == -2):
                     self.probabilityMatrix[row][col] = float(self.effectiveTotalMines)/float(unrevealedCount)
                 else:
                     self.probabilityMatrix[row][col] = 2
