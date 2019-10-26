@@ -58,7 +58,7 @@ class Agent:
     # After updating those cells we will update our knowledge in nearby neighbors
     # Returns all the changed elements
 
-    def updateKnowledge(self,i,j,val, query):
+    def updateKnowledge(self,i,j,val, query,bonus=False):
         self.agentBoard[i][j]=val
         noOfIter = 0
         currSet1=set()
@@ -74,14 +74,14 @@ class Agent:
             while (updated_set):
                 p, q = updated_set.pop()
                 if query:
-                    self.querySafeCells(p,q)
+                    self.querySafeCells(p,q,bonus)
             noOfIter += 1
         return changedElements
 
     # After identifying safe cell we will query it to reveal the count of mines around it
-    def querySafeCells(self, row, column):
+    def querySafeCells(self, row, column,bonus=False):
         if(self.agentBoard[row][column] == -3):
-            self.agentBoard[row][column] = self.env.reveal(row,column)
+            self.agentBoard[row][column] = self.env.reveal(row,column,bonus)
           
     # Method to Print the Agent Board( Minesweeper)
     def printMinesweeper(self):
@@ -219,14 +219,14 @@ class Agent:
         minProb.sort()
         return minProb[:noOfMin]
     
-    def expandInference(self):
+    def expandInference(self,val=False):
         minProbList = self.getMinProbabilityAll()
         bombs = [(x,y) for (p,x,y) in minProbList if p == 1]
         for (x,y) in bombs:
             self.updateKnowledge(x,y,-1,True)
         safes = [(x,y) for (p,x,y) in minProbList if p == 0]
         for (x,y) in safes:
-            self.updateKnowledge(x,y,self.env.reveal(x,y),True)
+            self.updateKnowledge(x,y,self.env.reveal(x,y,val),True,val)
 
 # Gives number of effectivemines around a cell(Total-revealed)    
     def getEffectiveMines(self,row,column):

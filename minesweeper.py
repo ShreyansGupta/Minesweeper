@@ -5,14 +5,14 @@ import Agent
 import Environment
 import strategies
 
-def iteration(agent,x,y):
+def iteration(agent,x,y,val=False):
     '''
     reveals the cell value at coordinates (x,y) and prints the Agent game board
     '''
     if(agent.agentBoard[x][y] != -2):
         print("SHOULDN'T COME HERE ERROR!!");
     # agent.agentBoard[x][y] = agent.env.reveal(x,y)
-    agent.updateKnowledge(x,y,agent.env.reveal(x,y),True)
+    agent.updateKnowledge(x,y,agent.env.reveal(x,y,val),True)
     agent.printMinesweeper()
 
 def playMinesweeper(env, getNextCell):
@@ -58,7 +58,7 @@ def playMinesweeperAI(env, getNextCell):
         if(res == -2 or res == -3):
             result = agent.env.reveal(x,y)  #reveals information about the cell.
             if(result == -1):
-                resultString += "Bomb blast"
+                # resultString += "Bomb blast"
                 blasts += 1
             elif(res == -3):
                 resultString += "Found safe cell"
@@ -73,3 +73,37 @@ def playMinesweeperAI(env, getNextCell):
     agent.printMinesweeper()
     return blasts
 
+
+def playMinesweeperAIBonus(env, getNextCell,val=True):
+    '''
+    env : Environment Object that stores the information of the enivronment or the board.
+    getNextCell : The stratergy used by the agent to decide the next move.
+    returns the number of times the agent clicked on a mine cell.
+    '''
+    agent = Agent.Agent(env,0)      # Create an object of Agent class
+    blasts = 0
+    noOfIter = 0
+    agent.printMinesweeper()
+    (x,y) = strategies.getFirstRandomNextCell(agent)    #Agent uniformly chooses any random cell to play the first move.
+    iteration(agent,x,y,val)
+    while(agent.getUnknownCount() > 0):     #Game still not completed
+        noOfIter += 1
+        (res,x,y) = getNextCell(agent)
+        resultString = "Revealed: "+str(x)+" "+str(y)+" "
+        if(res == -2 or res == -3):
+            result = agent.env.reveal(x,y,val)  #reveals information about the cell.
+            if(result == -1):
+                resultString += "Bomb blast"
+                blasts += 1
+            elif(res == -3):
+                resultString += "Found safe cell"
+        else:
+            resultString += "Found Bomb"
+            result = -1
+        # agent.agentBoard[x][y] = result
+        print(resultString)
+        agent.updateKnowledge(x,y,result,True,val)  # The agent updates its knowledge based on the information it recieved from its move.
+        agent.expandInference(val)
+        # agent.printMinesweeper()
+    agent.printMinesweeper()
+    return blasts
