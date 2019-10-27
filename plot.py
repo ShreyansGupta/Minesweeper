@@ -6,7 +6,7 @@ import Environment
 import Agent
 import pickle
 import minesweeper
-import strategies
+import strategies	
 import time
 
 dimension = 30

@@ -37,6 +37,19 @@ class Agent:
                 self.totalMines = env.env.no_of_mines
                 self.effectiveTotalMines = env.env.no_of_mines
 
+    def getSafeRevealed(self,row,column):
+        safe_revealed = 0
+        for i in [-1,0,1]:
+            for j in [-1,0,1]:
+                if(i == 0 and j == 0):
+                    continue;
+                elif 0<=row+i<self.dimension and 0<=column+j<self.dimension :
+                    if self.agentBoard[row+i][column+j] >= 0:
+                        safe_revealed += 1
+        # revealed = 8-len(unrevealed)
+        # safe_revealed = revealed - revealed_mines - safe_
+        return safe_revealed
+
     # This method returns unrevealed neighbors of a cell,total safe neighbors and revealed mines
     def getKnowledge(self,row,column):
         #Unrealved : returns list of coordinates
@@ -215,14 +228,21 @@ class Agent:
                     probability = float(effectiveMinesCount)/float(len(unrevealedList))
                     for (i,j) in unrevealedList:
                         if(self.improvement):
-                            self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
+                            self.probabilityMatrix[i][j]  += probability
                         else:
                             if(self.probabilityMatrix[i][j] == 2):
                                 self.probabilityMatrix[i][j] = probability
                             else:
-                                self.probabilityMatrix[i][j] = max(self.probabilityMatrix[i][j], probability)
+                                self.probabilityMatrix[i][j] += probability
                 elif(self.agentBoard[row][col] == -1):
                     self.probabilityMatrix[row][col] = 3.0
+        for row in range(self.dimension):
+            for column in range(self.dimension):
+                if(self.agentBoard[row][column] == -2):
+                    avgCount = self.getSafeRevealed(row,column)
+                    if(self.improvement):
+                        avgCount += 1
+                    self.probabilityMatrix[row][column] /= avgCount
     # All cells with probability less than 1
     def getMinProbabilityAll(self):
         minProb = []
