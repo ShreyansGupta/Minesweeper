@@ -28,7 +28,7 @@ def playMinesweeper(env, getNextCell):
     while(agent.getUnknownCount() > 0):     #Game still not completed
         noOfIter += 1
         (x,y) = getNextCell(agent)
-        print("Revealed: "+str(x)+" "+str(y))
+        # print("Revealed: "+str(x)+" "+str(y))
         result = agent.env.reveal(x,y)
         if(result == -1):
             print("Bomb blast")
@@ -48,7 +48,7 @@ def playMinesweeperAI(env, getNextCell):
     agent = Agent.Agent(env,0)      # Create an object of Agent class
     blasts = 0
     noOfIter = 0
-    agent.printMinesweeper()
+    # agent.printMinesweeper()
     (x,y) = strategies.getFirstRandomNextCell(agent)    #Agent uniformly chooses any random cell to play the first move.
     iteration(agent,x,y)
     while(agent.getUnknownCount() > 0):     #Game still not completed
@@ -66,11 +66,11 @@ def playMinesweeperAI(env, getNextCell):
             resultString += "Found Bomb"
             result = -1
         # agent.agentBoard[x][y] = result
-        print(resultString)
+        # print(resultString)
         agent.updateKnowledge(x,y,result,True)  # The agent updates its knowledge based on the information it recieved from its move.
         agent.expandInference()
         # agent.printMinesweeper()
-    agent.printMinesweeper()
+    # agent.printMinesweeper()
     return blasts
 
 def playMinesweeperAIImprov(env, getNextCell):
@@ -82,7 +82,7 @@ def playMinesweeperAIImprov(env, getNextCell):
     agent = Agent.Agent(env,0,True)      # Create an object of Agent class
     blasts = 0
     noOfIter = 0
-    agent.printMinesweeper()
+    # agent.printMinesweeper()
     (x,y) = strategies.getFirstRandomNextCell(agent)    #Agent uniformly chooses any random cell to play the first move.
     iteration(agent,x,y)
     while(agent.getUnknownCount() > 0):     #Game still not completed
@@ -100,10 +100,10 @@ def playMinesweeperAIImprov(env, getNextCell):
             resultString += "Found Bomb"
             result = -1
         # agent.agentBoard[x][y] = result
-        print(resultString)
+        # print(resultString)
         agent.updateKnowledge(x,y,result,True)  # The agent updates its knowledge based on the information it recieved from its move.
         agent.expandInference()
         # agent.printMinesweeper()
-    agent.printMinesweeper()
+    # agent.printMinesweeper()
     return blasts
 
